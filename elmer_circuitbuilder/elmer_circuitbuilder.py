@@ -1609,9 +1609,6 @@ def get_kcl_equations(c, num_nodes, num_variables, elmer_Amat, elmer_Bmat) -> st
     elmer_Bmat : numpy.ndarray of `bytes` strings
         Elmer format stiffness matrix
 
-    ofile : str
-        output file name
-
     Returns
     ----------
     None
