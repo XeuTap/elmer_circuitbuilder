@@ -1169,13 +1169,15 @@ def get_tableau_matrix_str(Amat_str, Rmat_str, Gmat_str, Lmat_str, Cmat_str, fve
 
     # Source term
     for i in range(len(fvec_str)):
-        if fvec_str[i].item().decode() == '' or fvec_str[i].item().decode() == '0.0' or fvec_str[i].item().decode() == '-0.0':
+        if fvec_str[i].item().decode() == '' or fvec_str[i].item().decode() == '0.0' or fvec_str[
+            i].item().decode() == '-0.0':
             fvec_str[i] = str(0)
     bvec_str = np.block([[np.zeros(shape=(numnodes - 1, 1))], [np.zeros(shape=(numedges, 1))], [fvec_str]])
 
     # redundant cleanup for int format looks
     for i in range(len(bvec_str)):
-        if bvec_str[i][0].item().decode() == '' or bvec_str[i][0].item().decode() == '0.0' or bvec_str[i][0].item().decode() == '-0.0':
+        if bvec_str[i][0].item().decode() == '' or bvec_str[i][0].item().decode() == '0.0' or bvec_str[i][
+            0].item().decode() == '-0.0':
             bvec_str[i][0] = str(0)
 
     # A matrix in Elmer
@@ -1186,7 +1188,7 @@ def get_tableau_matrix_str(Amat_str, Rmat_str, Gmat_str, Lmat_str, Cmat_str, fve
     for i in range(0, rows):
         for j in range(0, cols):
             if Mmat1_str[i][j].item().decode() == '' or Mmat1_str[i][j].item().decode() == '-0.0' \
-                or Mmat1_str[i][j].item().decode() == '0.0':
+                    or Mmat1_str[i][j].item().decode() == '0.0':
                 Mmat1_str[i][j] = str(0)
             if Mmat1_str[i][j].item().decode() == '-1.0':
                 Mmat1_str[i][j] = str(-1)
@@ -1197,7 +1199,7 @@ def get_tableau_matrix_str(Amat_str, Rmat_str, Gmat_str, Lmat_str, Cmat_str, fve
     for i in range(0, rows):
         for j in range(0, cols):
             if Mmat2_str[i][j].item().decode() == '' or Mmat2_str[i][j].item().decode() == '-0.0' \
-                or Mmat2_str[i][j].item().decode() == '0.0':
+                    or Mmat2_str[i][j].item().decode() == '0.0':
                 Mmat2_str[i][j] = str(0)
             if Mmat2_str[i][j].item().decode() == '-1.0':
                 Mmat2_str[i][j] = str(-1)
@@ -1566,8 +1568,6 @@ def get_source_vector(c, source_vector, postfix="_Source") -> str:
 
     source_vector : list of str
         Name of source terms in n entry vector
-    ofile : str
-        output file name
 
     Returns
     ----------
@@ -1579,11 +1579,11 @@ def get_source_vector(c, source_vector, postfix="_Source") -> str:
     definitions += "! Source Vector Definition\n"
     definitions += "! -----------------------------------------------------------------------------\n"
     for i, source_name in enumerate(source_vector):
-        if(source_name[0].item().decode() != str(0.0)) and (source_name[0].item().decode() != str(0)):
-            print("$ C." + str(c.index) + ".source." + str(i+1) + " = \"" + source_name[0].item().decode().strip("-") +
-                  "_Source\"", file=elmer_file)
-    print("", file=elmer_file)
-    elmer_file.close()
+        if (source_name[0].item().decode() != str(0.0)) and (source_name[0].item().decode() != str(0)):
+            definitions += "$ C." + str(c.index) + ".source." + str(i + 1) + " = \"" + source_name[
+                0].item().decode().strip(
+                "-") + postfix + "\"\n"
+    definitions += "\n"
 
     return definitions
 
@@ -1625,16 +1625,14 @@ def get_kcl_equations(c, num_nodes, num_variables, elmer_Amat, elmer_Bmat) -> st
     for i in range(num_nodes - 1):
         for j in range(num_variables):
             if (elmer_Bmat[i][j].item().decode() != str(0)) and (elmer_Bmat[i][j].item().decode() != str(0.0)):
-                print("$ C." + str(c.index) + ".B(" + str(i) + "," + str(j) + ")" + " = "
-                      + str(elmer_Bmat[i][j].item().decode()),
-                      file=elmer_file)
+                equations += "$ C." + str(c.index) + ".B(" + str(i) + "," + str(j) + ")" + " = " + str(
+                    elmer_Bmat[i][j].item().decode()) + "\n"
 
     for i in range(num_nodes - 1):
         for j in range(num_variables):
             if (elmer_Amat[i][j].item().decode() != str(0)) and (elmer_Amat[i][j].item().decode() != str(0.0)):
-                print("$ C." + str(c.index) + ".A(" + str(i) + "," + str(j) + ")" + " = "
-                      + str(elmer_Amat[i][j].item().decode()),
-                      file=elmer_file)
+                equations += "$ C." + str(c.index) + ".A(" + str(i) + "," + str(j) + ")" + " = " + str(
+                    elmer_Amat[i][j].item().decode()) + "\n"
 
     equations += "\n"
     return equations
@@ -1684,12 +1682,12 @@ def get_kvl_equations(c, num_nodes, num_edges, num_variables, elmer_Amat, elmer_
     source_names = []
     components = c.components[0]
     for component in components:
-        if (type(component)) == V or (type(component) == I):
+        if type(component) == I:
             source_names.append(component.name)
 
     source_sign_index = []
     for i, name in enumerate(unknown_names):
-        if (name.strip('"').strip("v_") in source_names) or (name.strip('"').strip("i_") in source_names):
+        if name.strip('"').strip("i_") in source_names:
             source_sign_index.append(i)
         else:
             source_sign_index.append(None)
@@ -1700,13 +1698,13 @@ def get_kvl_equations(c, num_nodes, num_edges, num_variables, elmer_Amat, elmer_
 
     for i in range(range_init, num_edges + range_init):
         for j in range(num_variables):
-            if (elmer_Bmat[i][j].item().decode().strip("-") != str(0)) and (elmer_Bmat[i][j].item().decode().strip("-") != str(0.0)):
+            if (elmer_Bmat[i][j].item().decode().strip("-") != str(0)) and (
+                    elmer_Bmat[i][j].item().decode().strip("-") != str(0.0)):
                 kvl_without_decimal = elmer_Bmat[i][j].item().decode().split(".")[0]
-                if(j == source_sign_index[j]):
-                    if("-" in kvl_without_decimal):
-                        print("$ C." + str(c.index) + ".B(" + str(i) + "," + str(j) + ")" + " = "
-                              + str(kvl_without_decimal.strip("-")),
-                              file=elmer_file)
+                if j == source_sign_index[j]:
+                    if "-" in kvl_without_decimal:
+                        equations += "$ C." + str(c.index) + ".B(" + str(i) + "," + str(j) + ")" + " = " + str(
+                            kvl_without_decimal.strip("-")) + "\n"
                     else:
                         equations += "$ C." + str(c.index) + ".B(" + str(i) + "," + str(j) + ")" + " = -" + str(
                             kvl_without_decimal.strip("-")) + "\n"
@@ -1716,11 +1714,10 @@ def get_kvl_equations(c, num_nodes, num_edges, num_variables, elmer_Amat, elmer_
 
     for i in range(range_init, num_edges + range_init):
         for j in range(num_variables):
-            if (elmer_Amat[i][j].item().decode().strip("-") != str(0)) and (elmer_Amat[i][j].item().decode().strip("-") != str(0.0)):
-                print("$ C." + str(c.index) + ".A(" + str(i) + "," + str(j) + ")" + " = "
-                      + str(elmer_Amat[i][j].item().decode()),
-                      file=elmer_file)
-    print("", file=elmer_file)
+            if (elmer_Amat[i][j].item().decode().strip("-") != str(0)) and (
+                    elmer_Amat[i][j].item().decode().strip("-") != str(0.0)):
+                equations += "$ C." + str(c.index) + ".A(" + str(i) + "," + str(j) + ")" + " = " + str(
+                    elmer_Amat[i][j].item().decode()) + "\n"
 
     return equations
 
@@ -1767,17 +1764,19 @@ def get_component_equations(c, num_nodes, num_edges, num_variables, elmer_Amat, 
 
     for i in range(range_init, num_edges + range_init):
         for j in range(num_variables):
-            if (elmer_Bmat[i][j].item().decode().strip("-") != str(0)) and (elmer_Bmat[i][j].item().decode().strip("-") != str(0.0)):
-                print("$ C." + str(c.index) + ".B(" + str(i) + "," + str(j) + ")" + " = " + str(elmer_Bmat[i][j].item().decode()),
-                      file=elmer_file)
+            if (elmer_Bmat[i][j].item().decode().strip("-") != str(0)) and (
+                    elmer_Bmat[i][j].item().decode().strip("-") != str(0.0)):
+                equations += "$ C." + str(c.index) + ".B(" + str(i) + "," + str(j) + ")" + " = " + str(
+                    elmer_Bmat[i][j].item().decode()) + "\n"
 
     equations += "\n"
 
     for i in range(range_init, num_edges + range_init):
         for j in range(num_variables):
-            if (elmer_Amat[i][j].item().decode().strip("-") != str(0)) and  (elmer_Amat[i][j].item().decode().strip("-") != str(0.0)):
-                print("$ C." + str(c.index) + ".A(" + str(i) + "," + str(j) + ")" + " = " + str(elmer_Amat[i][j].item().decode()),
-                      file=elmer_file)
+            if (elmer_Amat[i][j].item().decode().strip("-") != str(0)) and (
+                    elmer_Amat[i][j].item().decode().strip("-") != str(0.0)):
+                equations += "$ C." + str(c.index) + ".A(" + str(i) + "," + str(j) + ")" + " = " + str(
+                    elmer_Amat[i][j].item().decode()) + "\n"
 
     equations += "\n"
 
@@ -1826,7 +1825,7 @@ def get_sif_additions(c, source_vector) -> tuple:
     source_str_values = []
     for source_val in source_vector:
         if source_val[0].item().decode() != str(0.0) and source_val[0].item().decode() != str(0) \
-            and source_val[0].item().decode() not in source_str_values:
+                and source_val[0].item().decode() not in source_str_values:
             source_str_values.append(source_val[0].item().decode())
 
     additions += "! -----------------------------------------------------------------------------\n"
@@ -2018,9 +2017,6 @@ def generate_circuit(c, elmerA, elmerB, elmersource, unknown_names, num_nodes, n
 
     num_edges : int
         number of edges/components in circuit network
-
-    ofile : str
-        output file name
 
     Returns
     ----------
@@ -2294,7 +2290,6 @@ def write_elmer_circuits(circuit, output_file):
         file.write(body_forces_block)
 
 
-
 def generate_sif_matrices(circuit):
     # create list to store all body forces from each circuit def
     all_body_forces = []
@@ -2347,14 +2342,13 @@ def generate_sif_matrices(circuit):
         elmerA, elmerB, elmersource = elmer_format_matrix(M1_str, M2_str, b_str, vcomp_rows, zero_rows_str)  # noqa
 
         # create elmer circuits file
-        body_forces = generate_circuit(c, elmerA, elmerB, elmersource, unknown_names, num_nodes, num_edges,
-                                       ofile)
+        body_forces = generate_circuit(c, elmerA, elmerB, elmersource, unknown_names, num_nodes, num_edges)
         all_body_forces.append(body_forces)
 
         # just for debugging. valued matrices and solution solve if no elmer components
         solve_circuit(circuit)
 
-    write_body_forces(all_body_forces, ofile)
+    return all_body_forces
 
 
 class CircuitBuilderExceptions(Exception):
